@@ -8,14 +8,14 @@ contract OleanjiGamesToken is ERC20 {
     address public egtAddress;
     ERC20 egtToken;
 
-    constructor(address OGTAddress) ERC20("EXCLiquidityProvider", "ELP") {
+    constructor(address EGTAddress) ERC20("EXCLiquidityProvider", "ELP") {
         require(EGTAddress != address(0), "This is a zero address");
         egtAddress = EGTAddress;
         egtToken = ERC20(EGTAddress);
     }
 
     function AddLiquidity(uint EgtAmount) public payable returns (uint) {
-        uint egtBalance = getTotalOfOGTReserve();
+        uint egtBalance = getTotalOfEGTReserve();
         uint lpGotten;
         uint maticBalance = address(this).balance;
         if (egtBalance == 0) {
@@ -24,7 +24,7 @@ contract OleanjiGamesToken is ERC20 {
             _mint(msg.sender, LpGotten);
         } else {
             uint maticCurrentBalance = maticBalance - msg.value;
-            uint expectedEgtAmount = (msg.value * OgtBalance) /
+            uint expectedEgtAmount = (msg.value * egtBalance) /
                 (maticCurrentBalance);
             require(
                 EgtAmount >= expectedEgtAmount,
@@ -45,7 +45,7 @@ contract OleanjiGamesToken is ERC20 {
             amountToWithdawal > 0,
             "The amount is too small for a withdrawal"
         );
-        uint maticBalance = getTotalOfOGTReserve();
+        uint maticBalance = getTotalOfEGTReserve();
         uint _totalSupply = totalSupply();
         uint maticEquivalent = (maticBalance * amountToWithdawal) /
             _totalSupply;
@@ -68,27 +68,27 @@ contract OleanjiGamesToken is ERC20 {
         return numerator / denominator;
     }
 
-    function SwapMaticToOgt(uint minTokens) public payable {
-        uint OgtReserve = getTotalOfOGTReserve();
+    function SwapMaticToEgt(uint minTokens) public payable {
+        uint egtReserve = getTotalOfEGTReserve();
 
         uint tokenToCollect = getAmountOfTokens(
             msg.value,
             address(this).balance - msg.value,
-            OgtReserve
+            egtReserve
         );
         require(tokenToCollect >= minTokens, "insufficient");
         ERC20(egtAddress).transfer(msg.sender, tokenToCollect);
     }
 
-    function SwapOgtToMatic(uint Ogtsent, uint _mineth) public {
-        uint OgtReserve = getTotalOfOGTReserve();
+    function SwapEgtToMatic(uint egtsent, uint _minMatic) public {
+        uint EgtReserve = getTotalOfEGTReserve();
 
         uint tokenToCollect = getAmountOfTokens(
-            Ogtsent,
-            OgtReserve,
+            egtsent,
+            egtReserve,
             address(this).balance
         );
-        require(tokenToCollect >= _mineth, "insufficient");
+        require(tokenToCollect >= _mineMatic, "insufficient");
         ERC20(egtAddress).transferFrom(
             msg.sender,
             address(this),
@@ -97,7 +97,7 @@ contract OleanjiGamesToken is ERC20 {
         payable(msg.sender).transfer(tokenToCollect);
     }
 
-    function getTotalOfOGTReserve() public view returns (uint) {
+    function getTotalOfEGTReserve() public view returns (uint) {
         return ERC20(egtAddress).balanceOf(address(this));
     }
 }
