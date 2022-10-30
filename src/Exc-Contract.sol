@@ -22,6 +22,21 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
 
     error UpkeepNotNeeded();
 
+    /// -----------------------------------------------------------------------
+    /// Structs
+    /// -----------------------------------------------------------------------
+
+    struct Players {
+        uint playersId;
+        string userName;
+        address playersAddress;
+        uint gamesPlayed;
+        string dateJoined;
+        uint tokensOwned;
+        uint[] scores;
+        uint highestScore;
+        // bool spinning;
+    }
 
     /// -----------------------------------------------------------------------
     /// Global Variables
@@ -76,21 +91,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
        
 
 
-    /// -----------------------------------------------------------------------
-    /// Structs
-    /// -----------------------------------------------------------------------
-
-    struct Players {
-        uint playersId;
-        string userName;
-        address playersAddress;
-        uint gamesPlayed;
-        string dateJoined;
-        uint tokensOwned;
-        uint[] scores;
-        uint highestScore;
-        // bool spinning;
-    }
+   
 
 
     /// -----------------------------------------------------------------------
@@ -122,12 +123,11 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         payable
     {
         require(areyouAPlayer[msg.sender] == false, "you are already a player");
-
-        NumOfAllPlayers.increment();
-        uint value_given_to_new_players = gameEntryReward * 10**18;
-        _mint(msg.sender, value_given_to_new_players);
+        numOfAllPlayers.increment();
+        uint newPlayersRewards = gameEntryReward * 10**18;
+        _mint(msg.sender, newPlayersRewards);
         uint[] memory _scores = new uint[](0);
-        uint currentplayerId = NumOfAllPlayers.current();
+        uint currentplayerId = numOfAllPlayers.current();
         idOfPlayers[currentplayerId] = Players(
             _name,
             msg.sender,
@@ -140,7 +140,6 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
             false
         );
         addressOfPlayers[msg.sender] = currentplayerId;
-
         areyouAPlayer[msg.sender] = true;
 
         emit PlayerJoined(
@@ -159,20 +158,18 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
 
 
     function areYouAPlayer() public view returns (bool) {
-        bool isAPlayer = areyouAPlayer[msg.sender];
-        return isAPlayer;
+        return (areyouAPlayer[msg.sender]);
     }
 
 
 
     function GetAplayerdetails() public view returns (Players[] memory) {
-        Players[] memory ThisMember = new Players[](1);
+        Players[] memory thisMember = new Players[](1);
         uint _theId = addressOfPlayers[msg.sender];
         Players storage _member = idOfPlayers[_theId];
-        ThisMember[0] = _member;
-        return ThisMember;
+        thisMember[0] = _member;
+        return thisMember;
     }
-
 
 
 
@@ -181,7 +178,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         uint score,
         uint rewardtokens
     ) public {
-        uint AllPlayer = NumOfAllPlayers.current();
+        uint AllPlayer = numOfAllPlayers.current();
         uint addedrewards;
         for (uint i = 0; i < AllPlayer; i++) {
             if (_id == idOfPlayers[i + 1].PlayersId) {
@@ -215,7 +212,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         );
         require(areyouAPlayer[msg.sender] == true, "you are not a player");
         spinned[msg.sender] = true;
-        uint AllPlayer = NumOfAllPlayers.current();
+        uint AllPlayer = numOfAllPlayers.current();
         for (uint i = 0; i < AllPlayer; i++) {
             if (msg.sender == idOfPlayers[i + 1].PlayersAddress) {
                 idOfPlayers[i + 1].spinning = true;
