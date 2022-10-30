@@ -1,12 +1,11 @@
 //SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
-import "hardhat/console.sol";
 
 
 
@@ -218,7 +217,6 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
                 idOfPlayers[i + 1].spinning = true;
             }
         }
-        console.log("first");
         PeopleWhospinned.push(msg.sender);
 
         requestId = COORDINATOR.requestRandomWords(
@@ -237,9 +235,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         uint256, /* requestId */
         uint256[] memory randomWords
     ) internal override {
-        console.log("last");
         randomLuck = (randomWords[0] % boardItems) + 1;
-        console.log(randomLuck);
         ResetApplication();
     }
 

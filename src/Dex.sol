@@ -1,8 +1,8 @@
 //SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.13;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {ERC20} from "../lib/solmate/src/tokens/ERC20.sol";
 
 contract OleanjiGamesToken is ERC20 {
     address public egtAddress;
