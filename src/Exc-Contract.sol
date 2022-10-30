@@ -13,26 +13,23 @@ error UpkeepNotNeeded();
 contract GameToken is ERC20, VRFConsumerBaseV2 {
     using Counters for Counters.Counter;
     Counters.Counter internal numOfAllPlayers;
+    uint gameEntryReward = 200;
+    uint constant gameFee = 150;
 
-    
+    uint spinBoardPrice = 180;
 
-    uint internal entryFee = 50;
+    uint boardItems = 0;
 
-    uint spinBoardPrice = 200;
-
-    uint gamePlayPrice = 60;
-
-    uint no_of_items_on_board = 0;
     struct Players {
+        uint playersId;
         string userName;
         address playersAddress;
-        uint playersId;
-        uint myGames;
-        string datejoined;
-        uint tokenOwned;
+        uint gamesPlayed;
+        string dateJoined;
+        uint tokensOwned;
         uint[] scores;
         uint highestScore;
-        bool spinning;
+        // bool spinning;
     }
 
     address[] public PeopleWhoSpinned;
