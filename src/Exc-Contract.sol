@@ -8,9 +8,19 @@ import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "hardhat/console.sol";
 
-error UpkeepNotNeeded();
+
+
+/// @title EXC-GAME-CONTRACT
+/// @author Oleanji
+/// @notice A contract for gaming and dex exp
 
 contract GameToken is ERC20, VRFConsumerBaseV2 {
+    /// -----------------------------------------------------------------------
+    /// Errors
+    /// -----------------------------------------------------------------------
+
+    error UpkeepNotNeeded();
+
     using Counters for Counters.Counter;
     Counters.Counter internal numOfAllPlayers;
     uint gameEntryReward = 200;
@@ -20,6 +30,16 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
 
     uint boardItems = 0;
 
+
+
+   
+
+    mapping(address => bool) private areyouAPlayer;
+    mapping(address => bool) private Spinned;
+    mapping(uint => Players) private IdOfPlayers;
+    mapping(address => uint) private AddressOfPlayers;
+
+    
     struct Players {
         uint playersId;
         string userName;
@@ -34,29 +54,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
 
     address[] public PeopleWhoSpinned;
 
-    event PlayerJoined(
-        string username,
-        address player,
-        uint playerId,
-        uint noOfGames,
-        string dateJoined,
-        uint rewardTokensOwned,
-        uint[] Scores,
-        uint highestScore,
-        bool spinning
-    );
 
-    event GameEnded(
-        uint PlayerId,
-        address playersAddress,
-        uint tokensEarned,
-        uint Score
-    );
-
-    mapping(address => bool) private areyouAPlayer;
-    mapping(address => bool) private Spinned;
-    mapping(uint => Players) private IdOfPlayers;
-    mapping(address => uint) private AddressOfPlayers;
     uint mintToNewPlayers = 130;
 
     VRFCoordinatorV2Interface COORDINATOR;
@@ -82,6 +80,9 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
     address ownerAddress;
     uint public lastTimeStamp;
 
+/// -----------------------------------------------------------------------
+    /// Constructor
+    /// -----------------------------------------------------------------------
     constructor(
         uint _totalSupply,
         uint64 subscriptionId,
@@ -239,4 +240,26 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
 
     // Fallback function is called when msg.data is not empty
     fallback() external payable {}
+
+/// -----------------------------------------------------------------------
+    /// Events
+    /// -----------------------------------------------------------------------
+     event PlayerJoined(
+        string username,
+        address player,
+        uint playerId,
+        uint noOfGames,
+        string dateJoined,
+        uint rewardTokensOwned,
+        uint[] Scores,
+        uint highestScore,
+        bool spinning
+    );
+
+    event GameEnded(
+        uint PlayerId,
+        address playersAddress,
+        uint tokensEarned,
+        uint Score
+    );
 }
