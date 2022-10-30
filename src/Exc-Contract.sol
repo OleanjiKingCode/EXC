@@ -15,11 +15,17 @@ import "hardhat/console.sol";
 /// @notice A contract for gaming and dex exp
 
 contract GameToken is ERC20, VRFConsumerBaseV2 {
+
     /// -----------------------------------------------------------------------
     /// Errors
     /// -----------------------------------------------------------------------
 
     error UpkeepNotNeeded();
+
+
+    /// -----------------------------------------------------------------------
+    /// Global Variables
+    /// -----------------------------------------------------------------------
 
     using Counters for Counters.Counter;
     Counters.Counter internal numOfAllPlayers;
@@ -29,37 +35,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
     uint spinBoardPrice = 180;
 
     uint boardItems = 0;
-
-
-
-   
-
-    mapping(address => bool) private areyouAPlayer;
-    mapping(address => bool) private Spinned;
-    mapping(uint => Players) private IdOfPlayers;
-    mapping(address => uint) private AddressOfPlayers;
-
-    
-    struct Players {
-        uint playersId;
-        string userName;
-        address playersAddress;
-        uint gamesPlayed;
-        string dateJoined;
-        uint tokensOwned;
-        uint[] scores;
-        uint highestScore;
-        // bool spinning;
-    }
-
     address[] public PeopleWhoSpinned;
-
-
-    uint mintToNewPlayers = 130;
-
-    VRFCoordinatorV2Interface COORDINATOR;
-
-    uint64 s_subscriptionId;
 
     address vrfCoordinator = 0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed;
 
@@ -80,7 +56,42 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
     address ownerAddress;
     uint public lastTimeStamp;
 
-/// -----------------------------------------------------------------------
+
+    /// -----------------------------------------------------------------------
+    /// Mapping
+    /// -----------------------------------------------------------------------
+
+    mapping(address => bool) private areyouAPlayer;
+    mapping(address => bool) private Spinned;
+    mapping(uint => Players) private IdOfPlayers;
+    mapping(address => uint) private AddressOfPlayers;
+       
+
+
+    
+    struct Players {
+        uint playersId;
+        string userName;
+        address playersAddress;
+        uint gamesPlayed;
+        string dateJoined;
+        uint tokensOwned;
+        uint[] scores;
+        uint highestScore;
+        // bool spinning;
+    }
+
+
+
+    uint mintToNewPlayers = 130;
+
+    VRFCoordinatorV2Interface COORDINATOR;
+
+    uint64 s_subscriptionId;
+
+    
+
+    /// -----------------------------------------------------------------------
     /// Constructor
     /// -----------------------------------------------------------------------
     constructor(
@@ -97,6 +108,9 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         s_owner = msg.sender;
         lastTimeStamp = block.timestamp;
     }
+
+
+
 
     function NewPlayer(string memory _date, string memory _name)
         public
