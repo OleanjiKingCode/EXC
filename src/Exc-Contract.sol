@@ -56,6 +56,13 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
     address ownerAddress;
     uint public lastTimeStamp;
 
+    uint mintToNewPlayers = 130;
+
+    VRFCoordinatorV2Interface COORDINATOR;
+
+    uint64 s_subscriptionId;
+
+
 
     /// -----------------------------------------------------------------------
     /// Mapping
@@ -68,7 +75,10 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
        
 
 
-    
+    /// -----------------------------------------------------------------------
+    /// Structs
+    /// -----------------------------------------------------------------------
+
     struct Players {
         uint playersId;
         string userName;
@@ -81,15 +91,6 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         // bool spinning;
     }
 
-
-
-    uint mintToNewPlayers = 130;
-
-    VRFCoordinatorV2Interface COORDINATOR;
-
-    uint64 s_subscriptionId;
-
-    
 
     /// -----------------------------------------------------------------------
     /// Constructor
@@ -110,6 +111,9 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
     }
 
 
+    /// -----------------------------------------------------------------------
+    ///  functions
+    /// -----------------------------------------------------------------------
 
 
     function NewPlayer(string memory _date, string memory _name)
@@ -151,10 +155,14 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         );
     }
 
+
+
     function areYouAPlayer() public view returns (bool) {
         bool isAPlayer = areyouAPlayer[msg.sender];
         return isAPlayer;
     }
+
+
 
     function GetAplayerdetails() public view returns (Players[] memory) {
         Players[] memory ThisMember = new Players[](1);
@@ -163,6 +171,9 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         ThisMember[0] = _member;
         return ThisMember;
     }
+
+
+
 
     function gameEnded(
         uint _id,
@@ -193,6 +204,9 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         emit GameEnded(_id, msg.sender, rewardtokens, score);
     }
 
+
+
+
     function SpinBoard(uint pricePaid) public {
         require(
             pricePaid >= spinBoardPrice,
@@ -218,6 +232,9 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         );
     }
 
+
+
+
     function fulfillRandomWords(
         uint256, /* requestId */
         uint256[] memory randomWords
@@ -228,10 +245,15 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         ResetApplication();
     }
 
+
+
     function remove(uint index) public {
         PeopleWhoSpinned[index] = PeopleWhoSpinned[PeopleWhoSpinned.length - 1];
         PeopleWhoSpinned.pop();
     }
+
+
+
 
     function ResetApplication() public {
         for (uint i = 0; i < PeopleWhoSpinned.length; i++) {
@@ -255,10 +277,12 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
     // Fallback function is called when msg.data is not empty
     fallback() external payable {}
 
-/// -----------------------------------------------------------------------
+
+
+    /// -----------------------------------------------------------------------
     /// Events
     /// -----------------------------------------------------------------------
-     event PlayerJoined(
+    event PlayerJoined(
         string username,
         address player,
         uint playerId,
@@ -276,4 +300,5 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         uint tokensEarned,
         uint Score
     );
+
 }
