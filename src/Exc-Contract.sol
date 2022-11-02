@@ -221,11 +221,6 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         require(areyouAPlayer[msg.sender] == true, "you are not a player");
         spinned[msg.sender] = true;
         uint AllPlayer = numOfAllPlayers.current();
-        for (uint i = 0; i < AllPlayer; i++) {
-            if (msg.sender == idOfPlayers[i + 1].PlayersAddress) {
-                idOfPlayers[i + 1].spinning = true;
-            }
-        }
         PeopleWhospinned.push(msg.sender);
 
         requestId = COORDINATOR.requestRandomWords(
@@ -264,7 +259,6 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
                 spinned[currentAddress] == true
             ) {
                 uint _id = addressOfPlayers[currentAddress];
-                idOfPlayers[_id].spinning = false;
                 spinned[currentAddress] = false;
                 uint newMintingAmount = 10000 * 10**18;
                 _mint(currentAddress, newMintingAmount);

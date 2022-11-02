@@ -4,15 +4,30 @@ pragma solidity ^0.8.13;
 
 import {ERC20} from "../lib/solmate/src/tokens/ERC20.sol";
 
+/// @title EXC-GAME-Dex
+/// @author Oleanji
+/// @notice Decentralised exchange to swao exc for matic
+
 contract OleanjiGamesToken is ERC20 {
+    /// -----------------------------------------------------------------------
+    /// Variables
+    /// -----------------------------------------------------------------------
     address public egtAddress;
     ERC20 egtToken;
+
+    /// -----------------------------------------------------------------------
+    /// Constructor
+    /// -----------------------------------------------------------------------
 
     constructor(address EGTAddress) ERC20("EXCLiquidityProvider", "ELP") {
         require(EGTAddress != address(0), "This is a zero address");
         egtAddress = EGTAddress;
         egtToken = ERC20(EGTAddress);
     }
+
+    /// -----------------------------------------------------------------------
+    ///  functions
+    /// -----------------------------------------------------------------------
 
     function AddLiquidity(uint EgtAmount) public payable returns (uint) {
         uint egtBalance = getTotalOfEGTReserve();
