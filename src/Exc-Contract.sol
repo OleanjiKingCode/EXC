@@ -92,9 +92,6 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
        
 
 
-   
-
-
     /// -----------------------------------------------------------------------
     /// Constructor
     /// -----------------------------------------------------------------------
@@ -135,15 +132,15 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         uint[] memory _scores = new uint[](0);
         uint currentplayerId = numOfAllPlayers.current();
         idOfPlayers[currentplayerId] = Players(
+        currentplayerId,
             _name,
             msg.sender,
-            currentplayerId,
             0,
             _date,
             gameEntryReward,
             _scores,
             0,
-            false
+            0,
         );
         addressOfPlayers[msg.sender] = currentplayerId;
         areyouAPlayer[msg.sender] = true;
