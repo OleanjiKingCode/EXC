@@ -7,6 +7,8 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
+import {ERC20} from "../lib/solmate/src/tokens/ERC20.sol";
+
 
 
 /// @title EXC-GAME-CONTRACT
@@ -53,20 +55,22 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
 
     //address of the deployer
     address ownerAddress;
-    uint public lastTimeStamp;
-
 
     ////Chainlink vrf Vars
-    address vrfCoordinator = 0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed;
+    address vrfCoordinator;
+    // = 0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed;
 
-    bytes32 keyHash =
-        0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f;
+    bytes32 keyHash;
+    // =0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f;
 
-    uint32 callbackGasLimit = 100000;
+    uint32 callbackGasLimit;
+    //  = 100000;
 
-    uint16 requestConfirmations = 3;
+    uint16 requestConfirmations;
+    //  = 3;
 
-    uint32 numWords = 1;
+    uint32 numWords;
+    //  = 1;
 
     uint256 public randomLuck;
     address public winner;
@@ -108,7 +112,6 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
         subscriptionIdOfVrf = subscriptionId;
         s_owner = msg.sender;
-        lastTimeStamp = block.timestamp;
     }
 
 
