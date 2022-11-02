@@ -53,6 +53,8 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
     uint boardItems = 0;
     address[] public PeopleWhospinned;
 
+    uint256 internal Mintmore = 5000;
+
     //address of the deployer
     address ownerAddress;
 
@@ -146,15 +148,14 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         areyouAPlayer[msg.sender] = true;
 
         emit PlayerJoined(
-            _name,
+             _name,
             msg.sender,
-            currentplayerId,
             0,
             _date,
             gameEntryReward,
             _scores,
             0,
-            false
+            0,
         );
     }
 
@@ -165,26 +166,25 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
     }
 
 
-
     function GetAplayerdetails() public view returns (Players[] memory) {
         Players[] memory thisMember = new Players[](1);
-        uint _theId = addressOfPlayers[msg.sender];
-        Players storage _member = idOfPlayers[_theId];
-        thisMember[0] = _member;
+        uint theId = addressOfPlayers[msg.sender];
+        Players storage member = idOfPlayers[theId];
+        thisMember[0] = member;
         return thisMember;
     }
 
 
 
     function gameEnded(
-        uint _id,
+        uint id,
         uint score,
         uint rewardtokens
     ) public {
         uint AllPlayer = numOfAllPlayers.current();
         uint addedrewards;
         for (uint i = 0; i < AllPlayer; i++) {
-            if (_id == idOfPlayers[i + 1].PlayersId) {
+            if (id == idOfPlayers[i + 1].PlayersId) {
                 uint currentTokens = idOfPlayers[i + 1].TokenOwned;
                 addedrewards = currentTokens + rewardtokens;
                 idOfPlayers[i + 1].TokenOwned = addedrewards;
@@ -192,7 +192,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
                 idOfPlayers[i + 1].Scores.push(score);
             }
         }
-        uint256 Mintmore = 5000;
+        
         if (balanceOf(ownerAddress) < Mintmore) {
             uint newMintingAmount = 10000 * 10**18;
             _mint(ownerAddress, newMintingAmount);
@@ -202,7 +202,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         _mint(msg.sender, rewardtokensAward);
         _burn(ownerAddress, rewardtokensAward);
 
-        emit GameEnded(_id, msg.sender, rewardtokens, score);
+        emit GameEnded(id, msg.sender, rewardtokens, score);
     }
 
 
@@ -281,15 +281,14 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
     /// Events
     /// -----------------------------------------------------------------------
     event PlayerJoined(
-        string username,
-        address player,
-        uint playerId,
-        uint noOfGames,
-        string dateJoined,
-        uint rewardTokensOwned,
-        uint[] Scores,
-        uint highestScore,
-        bool spinning
+        uint playersId;
+        string userName;
+        address playersAddress;
+        uint gamesPlayed;
+        string dateJoined;
+        uint tokensOwned;
+        uint[] scores;
+        uint highestScore;
     );
 
     event GameEnded(
