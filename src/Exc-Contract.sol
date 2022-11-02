@@ -35,6 +35,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         string dateJoined;
         uint tokensOwned;
         uint[] scores;
+        string[] gameNames;
         uint highestScore;
         // bool spinning;
     }
@@ -131,7 +132,8 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         numOfAllPlayers.increment();
         uint newPlayersRewards = gameEntryReward * 10**18;
         _mint(msg.sender, newPlayersRewards);
-        uint[] memory _scores = new uint[](0);
+        uint[] memory scores = new uint[](0);
+        uint[] memory gameList = new uint[]('');
         uint currentplayerId = numOfAllPlayers.current();
         idOfPlayers[currentplayerId] = Players(
         currentplayerId,
@@ -140,7 +142,8 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
             0,
             _date,
             gameEntryReward,
-            _scores,
+            scores,
+            gameList,
             0,
             0,
         );
@@ -153,7 +156,8 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
             0,
             _date,
             gameEntryReward,
-            _scores,
+            scores,
+            gameList,
             0,
             0,
         );
@@ -179,7 +183,8 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
     function gameEnded(
         uint id,
         uint score,
-        uint rewardtokens
+        uint rewardtokens,
+        string gameName,
     ) public {
         uint AllPlayer = numOfAllPlayers.current();
         uint addedrewards;
@@ -251,8 +256,6 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
     }
 
 
-
-
     function ResetApplication() public {
         for (uint i = 0; i < PeopleWhospinned.length; i++) {
             address currentAddress = PeopleWhospinned[i];
@@ -288,6 +291,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         string dateJoined;
         uint tokensOwned;
         uint[] scores;
+        string[] gameNames;
         uint highestScore;
     );
 
