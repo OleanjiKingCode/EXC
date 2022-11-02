@@ -66,11 +66,9 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
     uint32 callbackGasLimit;
     //  = 100000;
 
-    uint16 requestConfirmations;
-    //  = 3;
+    uint16 requestConfirmations= 3;
 
-    uint32 numWords;
-    //  = 1;
+    uint32 numWords = 1;
 
     uint256 public randomLuck;
     address public winner;
@@ -103,13 +101,19 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
     constructor(
         uint _totalSupply,
         uint64 subscriptionIdOfVrf,
-        uint items_on_board
-    ) VRFConsumerBaseV2(vrfCoordinator) ERC20("EXCGameToken", EGT") {
+        uint items_on_board,
+        address s_vrfCoordinator, 
+        bytes32 s_keyHash,
+        uint32 s_callbackGasLimit,   
+    ) VRFConsumerBaseV2(s_vrfCoordinator) ERC20("EXCGameToken", EGT") {
         ownerAddress = msg.sender;
+        vrfCoordinator = s_vrfCoordinator;
+        keyHash=s_keyHash;
+        callbackGasLimit =s_callbackGasLimit;
         boardItems = items_on_board;
         uint amount = _totalSupply * 10**18;
         _mint(ownerAddress, amount);
-        COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
+        COORDINATOR = VRFCoordinatorV2Interface(s_vrfCoordinator);
         subscriptionIdOfVrf = subscriptionId;
         s_owner = msg.sender;
     }
