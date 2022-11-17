@@ -245,12 +245,6 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
 
 
 
-    function remove(uint index) public {
-        PeopleWhospinned[index] = PeopleWhospinned[PeopleWhospinned.length - 1];
-        PeopleWhospinned.pop();
-    }
-
-
     function ResetApplication() public {
         for (uint i = 0; i < PeopleWhospinned.length; i++) {
             address currentAddress = PeopleWhospinned[i];
@@ -267,6 +261,11 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         }
     }
 
+
+    function remove(uint index) public {
+        PeopleWhospinned[index] = PeopleWhospinned[PeopleWhospinned.length - 1];
+        PeopleWhospinned.pop();
+    }
     receive() external payable {}
 
     // Fallback function is called when msg.data is not empty
