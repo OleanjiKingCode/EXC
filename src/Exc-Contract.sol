@@ -2,12 +2,11 @@
 
 pragma solidity ^0.8.13;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {Counters} from '../lib/openzeppe';
+import "openzeppelin/token/ERC20/ERC20.sol";
+import "openzeppelin/utils/Counters.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
-import {ERC20} from "../lib/solmate/src/tokens/ERC20.sol";
 
 
 
