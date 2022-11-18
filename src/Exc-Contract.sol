@@ -39,6 +39,12 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
         // bool spinning;
     }
 
+    struct RequestStatus {
+        bool fulfilled; // whether the request has been successfully fulfilled
+        bool exists; // whether a requestId exists
+        uint256 randomWords;
+    }
+
     /// -----------------------------------------------------------------------
     /// Global Variables
     /// -----------------------------------------------------------------------
@@ -58,29 +64,27 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
     //address of the deployer
     address ownerAddress;
 
-    ////Chainlink vrf Vars
-    address vrfCoordinator;
-    // = 0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed;
-
-    bytes32 keyHash;
-    // =0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f;
-
-    uint32 callbackGasLimit;
-    //  = 100000;
-
-    uint16 requestConfirmations= 3;
-
-    uint32 numWords = 1;
-
-    uint256 public randomLuck;
-    address public winner;
-    uint256 public requestId;
-    address s_owner;
-
     VRFCoordinatorV2Interface COORDINATOR;
 
-    uint64 subscriptionId;
+    // Your subscription ID.
+    uint64 s_subscriptionId;
 
+    // past requests Id.
+    uint256[] public requestIds;
+    uint256 public lastRequestId;
+   
+
+   
+    bytes32 keyHash ;
+
+    
+    uint32 callbackGasLimit = 100000;
+
+  
+    uint16 requestConfirmations = 3;
+
+   
+    uint32 numWords = 2;
 
 
     /// -----------------------------------------------------------------------
@@ -91,7 +95,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
     mapping(address => bool) private spinned;
     mapping(uint => Players) private idOfPlayers;
     mapping(address => uint) private addressOfPlayers;
-       
+    mapping(uint256 => RequestStatus) public s_requests; /* requestId --> requestStatus */    
 
 
     /// -----------------------------------------------------------------------
@@ -102,19 +106,15 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
         uint64 subscriptionIdOfVrf,
         uint items_on_board,
         address s_vrfCoordinator, 
-        bytes32 s_keyHash,
-        uint32 s_callbackGasLimit,   
-    ) VRFConsumerBaseV2(s_vrfCoordinator) ERC20("EXCGameToken", EGT") {
+        bytes32 s_keyHash,   
+    ) VRFConsumerBaseV2(s_vrfCoordinator) ERC20("EXCGameToken", EGT") ConfirmedOwner(msg.sender) {
         ownerAddress = msg.sender;
-        vrfCoordinator = s_vrfCoordinator;
         keyHash=s_keyHash;
-        callbackGasLimit =s_callbackGasLimit;
         boardItems = items_on_board;
         uint amount = _totalSupply * 10**18;
         _mint(ownerAddress, amount);
         COORDINATOR = VRFCoordinatorV2Interface(s_vrfCoordinator);
-        subscriptionIdOfVrf = subscriptionId;
-        s_owner = msg.sender;
+        s_subscriptionId = subscriptionIdOfVrf;
     }
 
 
@@ -212,7 +212,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
 
 
 
-    function SpinBoard(uint pricePaid) public {
+    function SpinBoard(uint pricePaid) public  returns (uint256 requestId) {
         require(
             pricePaid >= spinBoardPrice,
             "The price for the spin board is not enough"
@@ -224,25 +224,43 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
 
         requestId = COORDINATOR.requestRandomWords(
             keyHash,
-            subscriptionId,
+            s_subscriptionId,
             requestConfirmations,
             callbackGasLimit,
             numWords
         );
+        s_requests[requestId] = RequestStatus({
+            randomWords: 0,
+            exists: true,
+            fulfilled: false
+        });
+        requestIds.push(requestId);
+        lastRequestId = requestId;
+        emit RequestSent(requestId, numWords);
+        return requestId;
     }
 
 
 
 
     function fulfillRandomWords(
-        uint256, /* requestId */
-        uint256[] memory randomWords
+        uint256, requestId 
+        uint256[] memory _randomWords
     ) internal override {
-        randomLuck = (randomWords[0] % boardItems) + 1;
+        require(s_requests[_requestId].exists, "request not found");
+        s_requests[_requestId].fulfilled = true;
+        s_requests[_requestId].randomWords = (_randomWords[0] % boardItems) + 1;
+        emit RequestFulfilled(_requestId, _randomWords);
         ResetApplication();
     }
 
-
+    function getRequestStatus(
+        uint256 _requestId
+    ) external view returns (bool fulfilled, uint256 randomWords) {
+        require(s_requests[_requestId].exists, "request not found");
+        RequestStatus memory request = s_requests[_requestId];
+        return (request.fulfilled, request.randomWords);
+    }
 
     function ResetApplication() public {
         for (uint i = 0; i < PeopleWhospinned.length; i++) {
@@ -293,5 +311,8 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
         uint tokensEarned,
         uint Score
     );
+
+    event RequestSent(uint256 requestId, uint32 numWords);
+    event RequestFulfilled(uint256 requestId, uint256[] randomWords);
 
 }
