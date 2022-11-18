@@ -3,7 +3,7 @@
 pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {Counters} from "../@openzeppelin-contracts/contracts/utils/Counters.sol";
+import {Counters} from '../lib/openzeppe';
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
@@ -15,7 +15,7 @@ import {ERC20} from "../lib/solmate/src/tokens/ERC20.sol";
 /// @author Oleanji
 /// @notice A contract for gaming and dex exp
 
-contract GameToken is ERC20, VRFConsumerBaseV2 {
+contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
 
     /// -----------------------------------------------------------------------
     /// Errors
