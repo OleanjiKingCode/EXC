@@ -165,7 +165,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         uint id,
         uint score,
         uint rewardtokens,
-        string gameName
+        string memory gameName
     ) public {
         uint AllPlayer = numOfAllPlayers.current();
         uint addedrewards;
@@ -220,8 +220,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
     }
 
     function fulfillRandomWords(
-        uint256,
-        requestId,
+        uint256 _requestId,
         uint256[] memory _randomWords
     ) internal override {
         require(s_requests[_requestId].exists, "request not found");
