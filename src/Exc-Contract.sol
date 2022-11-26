@@ -4,18 +4,14 @@ pragma solidity ^0.8.13;
 
 import "openzeppelin/token/ERC20/ERC20.sol";
 import "openzeppelin/utils/Counters.sol";
-import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
-import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
-
-
-
+import "chainlink/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
+import "chainlink/v0.8/VRFConsumerBaseV2.sol";
 
 /// @title EXC-GAME-CONTRACT
 /// @author Oleanji
 /// @notice A contract for gaming and dex exp
 
-contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
-
+contract GameToken is ERC20, VRFConsumerBaseV2 {
     /// -----------------------------------------------------------------------
     /// Errors
     /// -----------------------------------------------------------------------
@@ -72,20 +68,14 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
     // past requests Id.
     uint256[] public requestIds;
     uint256 public lastRequestId;
-   
 
-   
-    bytes32 keyHash ;
+    bytes32 keyHash;
 
-    
     uint32 callbackGasLimit = 100000;
 
-  
     uint16 requestConfirmations = 3;
 
-   
     uint32 numWords = 2;
-
 
     /// -----------------------------------------------------------------------
     /// Mapping
@@ -95,8 +85,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
     mapping(address => bool) private spinned;
     mapping(uint => Players) private idOfPlayers;
     mapping(address => uint) private addressOfPlayers;
-    mapping(uint256 => RequestStatus) public s_requests; /* requestId --> requestStatus */    
-
+    mapping(uint256 => RequestStatus) public s_requests; /* requestId --> requestStatus */
 
     /// -----------------------------------------------------------------------
     /// Constructor
@@ -105,11 +94,11 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
         uint _totalSupply,
         uint64 subscriptionIdOfVrf,
         uint items_on_board,
-        address s_vrfCoordinator, 
-        bytes32 s_keyHash,   
-    ) VRFConsumerBaseV2(s_vrfCoordinator) ERC20("EXCGameToken", EGT") ConfirmedOwner(msg.sender) {
+        address s_vrfCoordinator,
+        bytes32 s_keyHash
+    ) VRFConsumerBaseV2(s_vrfCoordinator) ERC20("EXCGameToken", "EGT") {
         ownerAddress = msg.sender;
-        keyHash=s_keyHash;
+        keyHash = s_keyHash;
         boardItems = items_on_board;
         uint amount = _totalSupply * 10**18;
         _mint(ownerAddress, amount);
@@ -117,11 +106,9 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
         s_subscriptionId = subscriptionIdOfVrf;
     }
 
-
     /// -----------------------------------------------------------------------
     ///  functions
     /// -----------------------------------------------------------------------
-
 
     function NewPlayer(string memory _date, string memory _name)
         public
@@ -132,10 +119,10 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
         uint newPlayersRewards = gameEntryReward * 10**18;
         _mint(msg.sender, newPlayersRewards);
         uint[] memory scores = new uint[](0);
-        uint[] memory gameList = new uint[]('');
+        uint[] memory gameList = new uint[]("");
         uint currentplayerId = numOfAllPlayers.current();
         idOfPlayers[currentplayerId] = Players(
-        currentplayerId,
+            currentplayerId,
             _name,
             msg.sender,
             0,
@@ -144,13 +131,13 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
             scores,
             gameList,
             0,
-            0,
+            0
         );
         addressOfPlayers[msg.sender] = currentplayerId;
         areyouAPlayer[msg.sender] = true;
 
         emit PlayerJoined(
-             _name,
+            _name,
             msg.sender,
             0,
             _date,
@@ -158,16 +145,13 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
             scores,
             gameList,
             0,
-            0,
+            0
         );
     }
-
-
 
     function areYouAPlayer() public view returns (bool) {
         return (areyouAPlayer[msg.sender]);
     }
-
 
     function GetAplayerdetails() public view returns (Players[] memory) {
         Players[] memory thisMember = new Players[](1);
@@ -177,13 +161,11 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
         return thisMember;
     }
 
-
-
     function gameEnded(
         uint id,
         uint score,
         uint rewardtokens,
-        string gameName,
+        string gameName
     ) public {
         uint AllPlayer = numOfAllPlayers.current();
         uint addedrewards;
@@ -196,7 +178,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
                 idOfPlayers[i + 1].Scores.push(score);
             }
         }
-        
+
         if (balanceOf(ownerAddress) < Mintmore) {
             uint newMintingAmount = 10000 * 10**18;
             _mint(ownerAddress, newMintingAmount);
@@ -209,10 +191,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
         emit GameEnded(id, msg.sender, rewardtokens, score);
     }
 
-
-
-
-    function SpinBoard(uint pricePaid) public  returns (uint256 requestId) {
+    function SpinBoard(uint pricePaid) public returns (uint256 requestId) {
         require(
             pricePaid >= spinBoardPrice,
             "The price for the spin board is not enough"
@@ -240,11 +219,9 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
         return requestId;
     }
 
-
-
-
     function fulfillRandomWords(
-        uint256, requestId 
+        uint256,
+        requestId,
         uint256[] memory _randomWords
     ) internal override {
         require(s_requests[_requestId].exists, "request not found");
@@ -254,9 +231,11 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
         ResetApplication();
     }
 
-    function getRequestStatus(
-        uint256 _requestId
-    ) external view returns (bool fulfilled, uint256 randomWords) {
+    function getRequestStatus(uint256 _requestId)
+        external
+        view
+        returns (bool fulfilled, uint256 randomWords)
+    {
         require(s_requests[_requestId].exists, "request not found");
         RequestStatus memory request = s_requests[_requestId];
         return (request.fulfilled, request.randomWords);
@@ -278,31 +257,29 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
         }
     }
 
-
     function remove(uint index) public {
         PeopleWhospinned[index] = PeopleWhospinned[PeopleWhospinned.length - 1];
         PeopleWhospinned.pop();
     }
+
     receive() external payable {}
 
     // Fallback function is called when msg.data is not empty
     fallback() external payable {}
 
-
-
     /// -----------------------------------------------------------------------
     /// Events
     /// -----------------------------------------------------------------------
     event PlayerJoined(
-        uint playersId;
-        string userName;
-        address playersAddress;
-        uint gamesPlayed;
-        string dateJoined;
-        uint tokensOwned;
-        uint[] scores;
-        string[] gameNames;
-        uint highestScore;
+        uint playersId,
+        string userName,
+        address playersAddress,
+        uint gamesPlayed,
+        string dateJoined,
+        uint tokensOwned,
+        uint[] scores,
+        string[] gameNames,
+        uint highestScore
     );
 
     event GameEnded(
@@ -314,5 +291,4 @@ contract GameToken is ERC20, VRFConsumerBaseV2, ConfirmedOwner {
 
     event RequestSent(uint256 requestId, uint32 numWords);
     event RequestFulfilled(uint256 requestId, uint256[] randomWords);
-
 }
