@@ -30,7 +30,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         string dateJoined;
         uint tokensOwned;
         uint[] scores;
-        string[] gameNames;
+        uint[] gameNames;
         uint highestScore;
         // bool spinning;
     }
@@ -119,7 +119,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         uint newPlayersRewards = gameEntryReward * 10**18;
         _mint(msg.sender, newPlayersRewards);
         uint[] memory scores = new uint[](0);
-        uint[] memory gameList = new uint[]("");
+        uint[] memory gameList = new uint[](0);
         uint currentplayerId = numOfAllPlayers.current();
         idOfPlayers[currentplayerId] = Players(
             currentplayerId,
@@ -130,13 +130,13 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
             gameEntryReward,
             scores,
             gameList,
-            0,
             0
         );
         addressOfPlayers[msg.sender] = currentplayerId;
         areyouAPlayer[msg.sender] = true;
 
         emit PlayerJoined(
+            currentplayerId,
             _name,
             msg.sender,
             0,
@@ -144,8 +144,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
             gameEntryReward,
             scores,
             gameList,
-            0,
-            0
+            0  
         );
     }
 
@@ -170,12 +169,12 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         uint AllPlayer = numOfAllPlayers.current();
         uint addedrewards;
         for (uint i = 0; i < AllPlayer; i++) {
-            if (id == idOfPlayers[i + 1].PlayersId) {
-                uint currentTokens = idOfPlayers[i + 1].TokenOwned;
+            if (id == idOfPlayers[i + 1].playersId) {
+                uint currentTokens = idOfPlayers[i + 1].tokensOwned;
                 addedrewards = currentTokens + rewardtokens;
-                idOfPlayers[i + 1].TokenOwned = addedrewards;
-                idOfPlayers[i + 1].MyGames += 1;
-                idOfPlayers[i + 1].Scores.push(score);
+                idOfPlayers[i + 1].tokensOwned = addedrewards;
+                idOfPlayers[i + 1].gamesPlayed += 1;
+                idOfPlayers[i + 1].scores.push(score);
             }
         }
 
@@ -277,7 +276,7 @@ contract GameToken is ERC20, VRFConsumerBaseV2 {
         string dateJoined,
         uint tokensOwned,
         uint[] scores,
-        string[] gameNames,
+        uint[] gameNames,
         uint highestScore
     );
 
